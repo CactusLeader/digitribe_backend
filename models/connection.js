@@ -7,7 +7,7 @@ const options = {
 };
 
 mongoose.connect(
-  "mongodb+srv://mongotest:mongotest@cluster0.0qy9h.mongodb.net/Digitrybe?retryWrites=true&w=majority",
+  "mongodb+srv://mongotest:mongotest@cluster0.0qy9h.mongodb.net/Digitribe?retryWrites=true&w=majority",
   options,
   function (err) {
     if (err) {
