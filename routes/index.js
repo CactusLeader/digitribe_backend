@@ -5,8 +5,6 @@ var userModel = require("../models/users");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
-const userModel = require("../models/users");
-
 /* GET home page. */
 router.get("/", function (req, res, next) {
   // input connection
