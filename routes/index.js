@@ -1,6 +1,11 @@
 var express = require("express");
 var router = express.Router();
 
+const uid2 = require("uid2");
+const bcrypt = require("bcrypt");
+
+const userModel = require("../models/users");
+
 /* GET home page. */
 router.get("/", function (req, res, next) {
   // input connection
@@ -14,9 +19,50 @@ router.get("/signUp", function (req, res, next) {
 });
 
 //SignUP
-router.post("/signUp", function (req, res, next) {
-  // récup  photo, description, langue et redirection vers /map
-  res.render("index", { title: "Express" });
+router.post("/signUp", async function (req, res, next) {
+  let error = [];
+  let result = false;
+  let saveUser = null;
+  let token = null;
+
+  const data = await userModel.findOne({
+    email: req.body.email,
+  });
+
+  if (data != null) {
+    error.push("utilisateur déjà présent");
+  }
+
+  if (
+    req.body.usernameFromFront == "" ||
+    req.body.emailFromFront == "" ||
+    req.body.passwordFromFront == ""
+  ) {
+    error.push("champs vides");
+  }
+
+  if (error.length == 0) {
+    const hash = bcrypt.hashSync(req.body.password, 10);
+    const newUser = new userModel({
+      lastName: req.body.lastName,
+      firstName: req.body.firstName,
+      email: req.body.email,
+      dateofbirth: req.body.date,
+      description: req.body.description,
+      language: req.body.language,
+      password: hash,
+      token: uid2(32),
+    });
+
+    saveUser = await newUser.save();
+
+    if (saveUser) {
+      result = true;
+      token = saveUser.token;
+    }
+  }
+
+  res.json({ result, saveUser, error, token });
 });
 
 //Login

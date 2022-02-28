@@ -13,7 +13,7 @@ mongoose.connect(
     if (err) {
       console.log("erreur :", err);
     } else {
-      console.log("Connexion OK");
+      console.log("Connexion OK. Courage, on va y arriver !!!!");
     }
   }
 );
