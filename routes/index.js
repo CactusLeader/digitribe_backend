@@ -67,9 +67,35 @@ router.post("/signUp", async function (req, res, next) {
 });
 
 //Login
-router.post("/login", function (req, res, next) {
-  // récup name et password et redirect vers /map si OK
-  res.render("index", { title: "Express" });
+router.post("/login", async function (req, res, next) {
+  let result = false;
+  let user = null;
+  let error = [];
+  let token = null;
+
+  if (req.body.email === "" || req.body.password === "") {
+    error.push("champs vides");
+  }
+
+  if (error.length === 0) {
+    user = await userModel.findOne({
+      email: req.body.email,
+    });
+
+    if (user) {
+      if (bcrypt.compareSync(req.body.password, user.password)) {
+        result = true;
+        token = user.token;
+      } else {
+        result = false;
+        error.push("mot de passe incorrect");
+      }
+    } else {
+      error.push("email incorrect");
+    }
+  }
+
+  res.json({ result, user, error, token });
 });
 
 //Map
