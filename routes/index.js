@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var userModel = require("../models/users");
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -31,10 +32,32 @@ router.get("/map", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-router.post("/place", function (req, res, next) {
+router.post("/place", async function (req, res, next) {
   // envoi géolocalisation
   // envoi info POI
-  res.render("index", { title: "Express" });
+  console.log("POST/req.body", req.body);
+  const userUpdate = await userModel.updateOne(
+    { token: "2yxtGnOEaT_mOCCv0llJn4mVsDZ4sLhc" },
+    {
+      location: {
+        lat: req.body.currentLatitude,
+        lon: req.body.currentLongitude,
+      },
+    }
+  );
+  console.log("userUpdate", userUpdate);
+
+  let result = false;
+  let location = {
+    lat: req.body.currentLatitude,
+    lon: req.body.currentLongitude,
+  };
+
+  if (userUpdate) {
+    result = true;
+  }
+
+  res.json({ result, location: location });
 });
 
 //Contact
