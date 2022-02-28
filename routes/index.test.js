@@ -5,7 +5,7 @@ test("recup point", async (done) => {
   const res = await request(app)
     .get("/map")
     .query({
-      coordinate: {
+      coordigitnate: {
         lat: 47.3,
         lon: 6.2,
       },
