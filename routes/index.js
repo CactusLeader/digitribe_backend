@@ -3,6 +3,7 @@ var router = express.Router();
 
 const userModel = require("../models/users");
 const messageModel = require("../models/messages");
+const interestModel = require("../models/interests");
 
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -14,13 +15,25 @@ router.get("/", function (req, res, next) {
 });
 
 //SignUP
-router.get("/signUp", function (req, res, next) {
-  // formulaire inscription
-  res.render("index", { title: "Express" });
+router.get("/signup", async function (req, res, next) {
+  const interests = await interestModel.find();
+  console.log(interests);
+
+  res.json({ interests });
+});
+
+router.post("/interest", async function (req, res, next) {
+  const newInterest = new interestModel({
+    name: req.body.name,
+    image: req.body.icon,
+  });
+
+  saveInterest = await newInterest.save();
+  res.json({ result: true, saveInterest });
 });
 
 //SignUP
-router.post("/signUp", async function (req, res, next) {
+router.post("/signup", async function (req, res, next) {
   let error = [];
   let result = false;
   let saveUser = null;
