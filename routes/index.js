@@ -108,7 +108,6 @@ router.get("/map", function (req, res, next) {
 });
 
 router.post("/place", async function (req, res, next) {
-  // envoi géolocalisation
   // envoi info POI
   console.log("POST/req.body", req.body);
   const userUpdate = await userModel.updateOne(
