@@ -1,10 +1,10 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const interrestSchema = mongoose.Schema({
-    name: String,
-    image: String,
-})
+const interestSchema = mongoose.Schema({
+  name: String,
+  image: String,
+});
 
-const interrestModel = mongoose.model('interrests', interrestSchema)
+const interestModel = mongoose.model("interests", interestSchema);
 
-module.exports = interrestModel;
+module.exports = interestModel;
