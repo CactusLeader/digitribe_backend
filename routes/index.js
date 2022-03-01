@@ -3,7 +3,9 @@ var router = express.Router();
 
 const userModel = require("../models/users");
 const messageModel = require("../models/messages");
+const interestModel = require("../models/interests");
 
+var uniqid = require("uniqid");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
 
@@ -14,13 +16,25 @@ router.get("/", function (req, res, next) {
 });
 
 //SignUP
-router.get("/signUp", function (req, res, next) {
-  // formulaire inscription
-  res.render("index", { title: "Express" });
+router.get("/signup", async function (req, res, next) {
+  const interests = await interestModel.find();
+  console.log(interests);
+
+  res.json({ interests });
+});
+
+router.post("/interest", async function (req, res, next) {
+  const newInterest = new interestModel({
+    name: req.body.name,
+    image: req.body.icon,
+  });
+
+  saveInterest = await newInterest.save();
+  res.json({ result: true, saveInterest });
 });
 
 //SignUP
-router.post("/signUp", async function (req, res, next) {
+router.post("/signup", async function (req, res, next) {
   let error = [];
   let result = false;
   let saveUser = null;
@@ -107,8 +121,8 @@ router.get("/map", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-router.post("/place", async function (req, res, next) {
-  // envoi info POI
+router.post("/map", async function (req, res, next) {
+  // enregistre géolocalisation en BDD
   console.log("POST/req.body", req.body);
   const userUpdate = await userModel.updateOne(
     { token: "2yxtGnOEaT_mOCCv0llJn4mVsDZ4sLhc" },
@@ -132,6 +146,24 @@ router.post("/place", async function (req, res, next) {
   }
 
   res.json({ result, location: location });
+});
+
+router.post("/place", async function (req, res, next) {
+  // enregistre Photo en BDD
+  console.log("req.files.photo", req.files.photo);
+  console.log("req.files.photo.name", req.files.photo.name);
+  console.log("req.files.photo.mimetype", req.files.photo.mimetype);
+  console.log("req.files.photo.data", req.files.photo.data);
+
+  var photoName = "./tmp/" + uniqid() + ".jpg";
+  console.log("photoName", photoName);
+  var resultCopy = await req.files.photo.mv(photoName);
+  console.log(resultCopy);
+  if (!resultCopy) {
+    res.json({ result: true });
+  } else {
+    res.json({ result: false });
+  }
 });
 
 //Contact
