@@ -1,6 +1,8 @@
 var express = require("express");
 var router = express.Router();
-var userModel = require("../models/users");
+
+const userModel = require("../models/users");
+const messageModel = require("../models/messages");
 
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -33,9 +35,12 @@ router.post("/signUp", async function (req, res, next) {
   }
 
   if (
-    req.body.usernameFromFront == "" ||
-    req.body.emailFromFront == "" ||
-    req.body.passwordFromFront == ""
+    req.body.lastName === "" ||
+    req.body.firstName === "" ||
+    req.body.email === "" ||
+    req.body.description === "" ||
+    req.body.language === "" ||
+    req.body.password === ""
   ) {
     error.push("champs vides");
   }
@@ -165,10 +170,36 @@ router.get("/profiles/users/:id", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-//message
-router.post("/messages/users/:token/recipients/:id", function (req, res, next) {
-  // pour discuter avec quelqu'un
-  res.render("index", { title: "Express" });
+//messages/users/:token/recipients/:id
+router.post("/messages", async function (req, res, next) {
+  let error = [];
+  let result = false;
+  let saveMessage = null;
+
+  if (req.body.message === "") {
+    error.push("champs vides");
+  }
+
+  const dataUser = await userModel.findOne({
+    token: req.body.tokenUser,
+  });
+
+  if (error.length === 0) {
+    const newMessage = new messageModel({
+      text: req.body.message,
+      date: req.body.date,
+      userIdEmit: dataUser._id,
+      userIdReception: req.body.recipientId,
+    });
+
+    saveMessage = await newMessage.save();
+
+    if (saveMessage) {
+      result = true;
+    }
+  }
+
+  res.json({ result, saveMessage, error });
 });
 
 router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
