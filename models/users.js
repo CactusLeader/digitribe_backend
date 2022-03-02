@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
-  lastName: String,
-  firstName: String,
+  lastname: String,
+  firstname: String,
   email: String,
   password: String,
   token: String,
-  dateofbirth: Date,
+  birthdate: Date,
   photo: String,
   description: String,
   language: String,
-  interestId: Array,
+  interestIds: Array,
   cityId: String,
   location: {
     lat: Number,

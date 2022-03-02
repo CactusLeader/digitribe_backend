@@ -6,6 +6,7 @@ const userModel = require("../models/users");
 const messageModel = require("../models/messages");
 const interestModel = require("../models/interests");
 
+const fs = require("fs");
 var uniqid = require("uniqid");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
@@ -23,7 +24,7 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-//SignUP
+//Signup
 router.get("/signup", async function (req, res, next) {
   const interests = await interestModel.find();
   console.log(interests);
@@ -42,11 +43,31 @@ router.post("/interest", async function (req, res, next) {
 });
 
 //SignUP
+router.post("/signup/avatar", async function (req, res, next) {
+  const filepath = "./tmp/" + uniqid() + ".jpg";
+  const avatar = await req.files.avatar.mv(filepath);
+
+  if (!avatar) {
+    const avatarUpload = await cloudinary.uploader.upload(filepath);
+    console.log(avatarUpload.secure_url);
+
+    fs.unlinkSync(filepath);
+
+    if (avatarUpload) {
+      res.json({ result: true, url: avatarUpload.secure_url });
+    }
+  } else {
+    res.json({ result: false });
+  }
+});
+
 router.post("/signup", async function (req, res, next) {
   let error = [];
   let result = false;
   let saveUser = null;
   let token = null;
+
+  console.log(req.body);
 
   const data = await userModel.findOne({
     email: req.body.email,
@@ -56,27 +77,18 @@ router.post("/signup", async function (req, res, next) {
     error.push("utilisateur déjà présent");
   }
 
-  if (
-    req.body.lastName === "" ||
-    req.body.firstName === "" ||
-    req.body.email === "" ||
-    req.body.description === "" ||
-    req.body.language === "" ||
-    req.body.password === ""
-  ) {
-    error.push("champs vides");
-  }
-
   if (error.length == 0) {
     const hash = bcrypt.hashSync(req.body.password, 10);
     const newUser = new userModel({
-      lastName: req.body.lastName,
-      firstName: req.body.firstName,
+      lastname: req.body.lastname,
+      firstname: req.body.firstname,
       email: req.body.email,
-      dateofbirth: req.body.date,
+      password: hash,
+      birthdate: req.body.birthdate,
+      photo: req.body.photo,
       description: req.body.description,
       language: req.body.language,
-      password: hash,
+      interestIds: req.body.interestIds,
       token: uid2(32),
     });
 
@@ -182,10 +194,12 @@ router.post("/place", async function (req, res, next) {
   fs.unlinkSync(photoName);
 });
 
-//Contact
-router.get("/messages/users/:token/recipients", function (req, res, next) {
-  // récup  personnes déjà contacté / derniers messages
-  res.render("index", { title: "Express" });
+//messages/users/:token/recipients
+router.get("/contact", async function (req, res, next) {
+  const contact = await userModel.find();
+  console.log(contact);
+
+  res.json({ contact });
 });
 
 //EditProfile
@@ -237,6 +251,7 @@ router.post("/messages", async function (req, res, next) {
       date: req.body.date,
       userIdEmit: dataUser._id,
       userIdReception: req.body.recipientId,
+      read: false,
     });
 
     saveMessage = await newMessage.save();
@@ -246,7 +261,7 @@ router.post("/messages", async function (req, res, next) {
     }
   }
 
-  res.json({ result, saveMessage, error });
+  res.json({ result, saveMessage, error, token: dataUser.token });
 });
 
 router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
