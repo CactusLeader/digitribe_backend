@@ -1,12 +1,13 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const messageSchema = mongoose.Schema({
-    text: String,
-    date: Date,
-    userIdEmit: String,
-    userIdReception: String,
-})
+  text: String,
+  date: Date,
+  userIdEmit: String,
+  userIdReception: String,
+  read: Boolean,
+});
 
-const messageModel = mongoose.model('messages', messageSchema)
+const messageModel = mongoose.model("messages", messageSchema);
 
 module.exports = messageModel;
