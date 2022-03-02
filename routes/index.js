@@ -221,7 +221,7 @@ router.post("/messages", async function (req, res, next) {
       date: req.body.date,
       userIdEmit: dataUser._id,
       userIdReception: req.body.recipientId,
-      read: "false",
+      read: false,
     });
 
     saveMessage = await newMessage.save();
