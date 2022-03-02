@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var fs = require("fs");
 
 const userModel = require("../models/users");
 const messageModel = require("../models/messages");
@@ -8,6 +9,13 @@ const interestModel = require("../models/interests");
 var uniqid = require("uniqid");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
+
+var cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: "dgeqxban7",
+  api_key: "487115147289289",
+  api_secret: "hssz7K4rgUNLRETqmqUQprPaKZ4",
+});
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -159,11 +167,19 @@ router.post("/place", async function (req, res, next) {
   console.log("photoName", photoName);
   var resultCopy = await req.files.photo.mv(photoName);
   console.log(resultCopy);
+
+  var resultCloudinary = await cloudinary.uploader.upload(photoName);
+  console.log("resultCloudinary", resultCloudinary);
+  console.log("resultCloudinary--url", resultCloudinary.secure_url);
+
   if (!resultCopy) {
-    res.json({ result: true });
+    result = true;
+    res.json({ result: result, url: resultCloudinary.secure_url });
   } else {
-    res.json({ result: false });
+    result = false;
+    res.json({ result: result, resultCopy: resultCopy });
   }
+  fs.unlinkSync(photoName);
 });
 
 //Contact
