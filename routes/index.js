@@ -231,7 +231,7 @@ router.post("/messages", async function (req, res, next) {
     }
   }
 
-  res.json({ result, saveMessage, error });
+  res.json({ result, saveMessage, error, token: dataUser.token });
 });
 
 router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
