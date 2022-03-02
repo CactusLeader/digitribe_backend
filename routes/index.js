@@ -5,9 +5,17 @@ const userModel = require("../models/users");
 const messageModel = require("../models/messages");
 const interestModel = require("../models/interests");
 
+const fs = require("fs");
 var uniqid = require("uniqid");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
+
+var cloudinary = require("cloudinary").v2;
+cloudinary.config({
+  cloud_name: "dtxkm8ots",
+  api_key: "917555748568271",
+  api_secret: "7V4HBoGAqhpVeGBwnqd8vTZBYy8",
+});
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -15,7 +23,7 @@ router.get("/", function (req, res, next) {
   res.render("index", { title: "Express" });
 });
 
-//SignUP
+//Signup
 router.get("/signup", async function (req, res, next) {
   const interests = await interestModel.find();
   console.log(interests);
@@ -34,11 +42,31 @@ router.post("/interest", async function (req, res, next) {
 });
 
 //SignUP
+router.post("/signup/avatar", async function (req, res, next) {
+  const filepath = "./tmp/" + uniqid() + ".jpg";
+  const avatar = await req.files.avatar.mv(filepath);
+
+  if (!avatar) {
+    const avatarUpload = await cloudinary.uploader.upload(filepath);
+    console.log(avatarUpload.secure_url);
+
+    fs.unlinkSync(filepath);
+
+    if (avatarUpload) {
+      res.json({ result: true, url: avatarUpload.secure_url });
+    }
+  } else {
+    res.json({ result: false });
+  }
+});
+
 router.post("/signup", async function (req, res, next) {
   let error = [];
   let result = false;
   let saveUser = null;
   let token = null;
+
+  console.log(req.body);
 
   const data = await userModel.findOne({
     email: req.body.email,
@@ -48,27 +76,18 @@ router.post("/signup", async function (req, res, next) {
     error.push("utilisateur déjà présent");
   }
 
-  if (
-    req.body.lastName === "" ||
-    req.body.firstName === "" ||
-    req.body.email === "" ||
-    req.body.description === "" ||
-    req.body.language === "" ||
-    req.body.password === ""
-  ) {
-    error.push("champs vides");
-  }
-
   if (error.length == 0) {
     const hash = bcrypt.hashSync(req.body.password, 10);
     const newUser = new userModel({
-      lastName: req.body.lastName,
-      firstName: req.body.firstName,
+      lastname: req.body.lastname,
+      firstname: req.body.firstname,
       email: req.body.email,
-      dateofbirth: req.body.date,
+      password: hash,
+      birthdate: req.body.birthdate,
+      photo: req.body.photo,
       description: req.body.description,
       language: req.body.language,
-      password: hash,
+      interestIds: req.body.interestIds,
       token: uid2(32),
     });
 
