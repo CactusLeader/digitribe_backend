@@ -166,10 +166,12 @@ router.post("/place", async function (req, res, next) {
   }
 });
 
-//Contact
-router.get("/messages/users/:token/recipients", function (req, res, next) {
-  // récup  personnes déjà contacté / derniers messages
-  res.render("index", { title: "Express" });
+//messages/users/:token/recipients
+router.get("/contact", async function (req, res, next) {
+  const contact = await userModel.find();
+  console.log(contact);
+
+  res.json({ contact });
 });
 
 //EditProfile
