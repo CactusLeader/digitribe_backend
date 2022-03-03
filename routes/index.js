@@ -229,11 +229,12 @@ router.get("/profiles/users", async function (req, res, next) {
 
 //profile/user
 router.get("/profiles/users/:id", async function (req, res, next) {
-  // information user
   const id = req.params.id;
   console.log(id);
   const people = await userModel.findById(id);
   console.log(people);
+
+  // Envoi des infos nécéssaires uniquement
   const peopleFind = {
     firstname: people.firstname,
     photo: people.photo,
