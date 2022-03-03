@@ -245,37 +245,43 @@ router.get("/profiles/users/:id", async function (req, res, next) {
 });
 
 //messages/users/:token/recipients/:id
-router.post("/messages", async function (req, res, next) {
-  let error = [];
-  let result = false;
-  let saveMessage = null;
+router.post(
+  "/messages/users/:token/recipients/:id",
+  async function (req, res, next) {
+    let error = [];
+    let result = false;
+    let saveMessage = null;
 
-  if (req.body.message === "") {
-    error.push("champs vides");
-  }
+    const token = req.params.token;
+    const id = req.params.id;
 
-  const dataUser = await userModel.findOne({
-    token: req.body.tokenUser,
-  });
+    if (req.body.message === "") {
+      error.push("champs vides");
+    }
 
-  if (error.length === 0) {
-    const newMessage = new messageModel({
-      text: req.body.message,
-      date: req.body.date,
-      userIdEmit: dataUser._id,
-      userIdReception: req.body.recipientId,
-      read: false,
+    const dataUser = await userModel.findOne({
+      token: token,
     });
 
-    saveMessage = await newMessage.save();
+    if (error.length === 0) {
+      const newMessage = new messageModel({
+        text: req.body.message,
+        date: req.body.date,
+        userIdEmit: dataUser._id,
+        userIdReception: id,
+        read: false,
+      });
 
-    if (saveMessage) {
-      result = true;
+      saveMessage = await newMessage.save();
+
+      if (saveMessage) {
+        result = true;
+      }
     }
-  }
 
-  res.json({ result, saveMessage, error, token: dataUser.token });
-});
+    res.json({ result, saveMessage, error, token: dataUser.token, userId: id });
+  }
+);
 
 router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
   // pour récupérer les messages
