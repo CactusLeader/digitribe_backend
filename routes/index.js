@@ -219,15 +219,29 @@ router.get("/cities/:id", function (req, res, next) {
 });
 
 //profile/list
-router.get("/profiles/users", function (req, res, next) {
+router.get("/profiles/users", async function (req, res, next) {
   // liste personne dans le coin
-  res.render("index", { title: "Express" });
+
+  const peopleAround = await userModel.find();
+
+  res.json({ peopleAround });
 });
 
 //profile/user
-router.get("/profiles/users/:id", function (req, res, next) {
+router.get("/profiles/users/:id", async function (req, res, next) {
   // information user
-  res.render("index", { title: "Express" });
+  const id = req.params.id;
+  console.log(id);
+  const people = await userModel.findById(id);
+  console.log(people);
+  const peopleFind = {
+    firstname: people.firstname,
+    photo: people.photo,
+    description: people.description,
+    interests: people.interestsIds,
+  };
+
+  res.json({ peopleFind });
 });
 
 //messages/users/:token/recipients/:id
