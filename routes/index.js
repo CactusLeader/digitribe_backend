@@ -196,7 +196,7 @@ router.post("/place", async function (req, res, next) {
 //messages/users/:token/recipients
 router.get("/contact", async function (req, res, next) {
   const contact = await userModel.find();
-  console.log(contact);
+  // console.log(contact);
 
   res.json({ contact });
 });
@@ -286,6 +286,35 @@ router.post(
 router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
   // pour récupérer les messages
   res.render("index", { title: "Express" });
+});
+
+router.get("/contact/users/:token", async function (req, res, next) {
+  // pour récupérer les messages dans contact
+  let result = false;
+  const token = req.params.token;
+
+  const dataUser = await userModel.findOne({
+    token: token,
+  });
+
+  console.log("dataUser", dataUser);
+  console.log("dataUser._id", dataUser._id);
+
+  const id = dataUser._id;
+
+  const dataMessagesReceive = await messageModel.find({
+    userIdReception: id,
+  });
+
+  const dataMessagesEmit = await messageModel.find({
+    userIdEmit: id,
+  });
+
+  if (dataMessagesReceive.length > 0 || dataMessagesEmit.length > 0) {
+    result = true;
+  }
+
+  res.json({ result, dataMessagesReceive, dataMessagesEmit });
 });
 
 module.exports = router;
