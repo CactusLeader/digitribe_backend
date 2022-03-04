@@ -318,6 +318,7 @@ router.get(
       dataRecipient,
       dataMessagesEmit,
       dataMessagesReception,
+      id: dataUser._id,
     });
   }
 );
