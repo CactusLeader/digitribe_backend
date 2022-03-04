@@ -298,15 +298,17 @@ router.get(
 
     const dataRecipient = await userModel.findById(idRecipient);
 
-    const dataMessagesReceive = await messageModel.find({
-      userIdReception: idRecipient,
-    });
-
     const dataMessagesEmit = await messageModel.find({
+      userIdReception: idRecipient,
       userIdEmit: dataUser._id,
     });
 
-    if (dataMessagesReceive.length > 0 || dataMessagesEmit.length > 0) {
+    const dataMessagesReception = await messageModel.find({
+      userIdReception: dataUser._id,
+      userIdEmit: idRecipient,
+    });
+
+    if (dataMessagesEmit.length > 0 || dataMessagesReception.length > 0) {
       result = true;
     }
 
@@ -314,8 +316,8 @@ router.get(
       result,
       dataUser,
       dataRecipient,
-      dataMessagesReceive,
       dataMessagesEmit,
+      dataMessagesReception,
     });
   }
 );
