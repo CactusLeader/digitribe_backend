@@ -142,9 +142,11 @@ router.get("/map", function (req, res, next) {
 
 router.post("/map", async function (req, res, next) {
   // enregistre géolocalisation en BDD
-  console.log("POST/req.body", req.body);
+  console.log('req.body', req.body)
+  console.log('req.body.token', req.body.token)
+  
   const userUpdate = await userModel.updateOne(
-    { token: "2yxtGnOEaT_mOCCv0llJn4mVsDZ4sLhc" },
+    { token:req.body.token },
     {
       location: {
         lat: req.body.currentLatitude,
