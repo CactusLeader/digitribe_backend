@@ -284,10 +284,41 @@ router.post(
   }
 );
 
-router.get("/messages/users/:token/recipients/:id", function (req, res, next) {
-  // pour récupérer les messages
-  res.render("index", { title: "Express" });
-});
+router.get(
+  "/messages/users/:token/recipients/:id",
+  async function (req, res, next) {
+    // pour récupérer les messages
+    let result = false;
+    const token = req.params.token;
+    const idRecipient = req.params.id;
+
+    const dataUser = await userModel.findOne({
+      token: token,
+    });
+
+    const dataRecipient = await userModel.findById(idRecipient);
+
+    const dataMessagesReceive = await messageModel.find({
+      userIdReception: idRecipient,
+    });
+
+    const dataMessagesEmit = await messageModel.find({
+      userIdEmit: dataUser._id,
+    });
+
+    if (dataMessagesReceive.length > 0 || dataMessagesEmit.length > 0) {
+      result = true;
+    }
+
+    res.json({
+      result,
+      dataUser,
+      dataRecipient,
+      dataMessagesReceive,
+      dataMessagesEmit,
+    });
+  }
+);
 
 router.get("/contact/users/:token", async function (req, res, next) {
   // pour récupérer les messages dans contact
