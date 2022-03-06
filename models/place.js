@@ -6,7 +6,7 @@ const placeSchema = mongoose.Schema({
   title: String,
   coordinate: Object,
   rating: Number,
-  userId: String,
+  userId: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
   cityId: String,
 });
 

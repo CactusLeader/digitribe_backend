@@ -4,6 +4,7 @@ var router = express.Router();
 const userModel = require("../models/users");
 const messageModel = require("../models/messages");
 const interestModel = require("../models/interests");
+const placeModel = require("../models/place");
 
 const fs = require("fs");
 var uniqid = require("uniqid");
@@ -142,11 +143,11 @@ router.get("/map", function (req, res, next) {
 
 router.post("/map", async function (req, res, next) {
   // enregistre géolocalisation en BDD
-  console.log('req.body', req.body)
-  console.log('req.body.token', req.body.token)
-  
+  console.log("req.body", req.body);
+  console.log("req.body.token", req.body.token);
+
   const userUpdate = await userModel.updateOne(
-    { token:req.body.token },
+    { token: req.body.token },
     {
       location: {
         lat: req.body.currentLatitude,
@@ -170,7 +171,40 @@ router.post("/map", async function (req, res, next) {
 });
 
 router.post("/place", async function (req, res, next) {
+  //enregistre Poi en BDD
+  console.log("req.body", req.body);
+
+  const newPlace = new placeModel(
+    {
+      photo: req.body.photo,
+      description: req.body.description,
+      title: req.body.title,
+      coordinate: {
+        lat: req.body.latitude,
+        lon: req.body.longitude,
+      },
+      userId: req.body._id
+    }
+  );
+  console.log("newPlace", newPlace)
+  savePlace = await newPlace.save();
+
+  let result = false;
+
+  if (newPlace) {
+    result = true;
+  }
+
+  var place = await placeModel.findById(req.body._id).populate('userId')
+  console.log('newPlace.title', newPlace.title)
+  console.log('newPlace.userId.firstname', newPlace.userId.firstname)
+
+  res.json({ result, newPlace });
+});
+
+router.post("/upload", async function (req, res, next) {
   // enregistre Photo en BDD
+
   console.log("req.files.photo", req.files.photo);
   console.log("req.files.photo.name", req.files.photo.name);
   console.log("req.files.photo.mimetype", req.files.photo.mimetype);
