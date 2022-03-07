@@ -67,7 +67,7 @@ router.post("/signup", async function (req, res, next) {
   let saveUser = null;
   let token = null;
 
-  console.log(req.body);
+  console.log("req.body", req.body);
 
   const data = await userModel.findOne({
     email: req.body.email,
@@ -76,6 +76,8 @@ router.post("/signup", async function (req, res, next) {
   if (data != null) {
     error.push("utilisateur déjà présent");
   }
+
+  const interestIds = req.body.interestIds.split(",");
 
   if (error.length == 0) {
     const hash = bcrypt.hashSync(req.body.password, 10);
@@ -88,7 +90,7 @@ router.post("/signup", async function (req, res, next) {
       photo: req.body.photo,
       description: req.body.description,
       language: req.body.language,
-      interestIds: req.body.interestIds,
+      interestIds,
       token: uid2(32),
     });
 
@@ -299,12 +301,23 @@ router.get("/profiles/users/:id", async function (req, res, next) {
   const people = await userModel.findById(id);
   console.log(people);
 
+  const interestsIds = people.interestIds;
+  console.log("interestsIds", interestsIds);
+
+  let interests = [];
+  for (let interest of interestsIds) {
+    console.log("interest", interest);
+    const newInterest = await interestModel.findById(interest);
+    interests.push(newInterest);
+  }
+
   // Envoi des infos nécéssaires uniquement
   const peopleFind = {
     firstname: people.firstname,
     photo: people.photo,
+    interests: interests,
     description: people.description,
-    interests: people.interestsIds,
+    birthdate: people.birthdate,
   };
 
   res.json({ peopleFind });
