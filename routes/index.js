@@ -387,12 +387,12 @@ router.get("/contact/users/:token", async function (req, res, next) {
     dataUsers2.push(data);
   }
 
-  for (let i = 0; i < dataMessagesEmit.length; i++) {
-    let data2 = await userModel.findOne({
-      _id: dataMessagesReceive[i].userIdEmit,
-    });
-    dataUsers2.push(data2);
-  }
+  // for (let i = 0; i < dataMessagesEmit.length; i++) {
+  //   let data2 = await userModel.findOne({
+  //     _id: dataMessagesReceive[i].userIdEmit,
+  //   });
+  //   dataUsers2.push(data2);
+  // }
 
   dataUserFiltered = dataUsers2.map(JSON.stringify);
 
