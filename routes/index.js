@@ -142,11 +142,11 @@ router.get("/map", function (req, res, next) {
 
 router.post("/map", async function (req, res, next) {
   // enregistre géolocalisation en BDD
-  console.log('req.body', req.body)
-  console.log('req.body.token', req.body.token)
-  
+  console.log("req.body", req.body);
+  console.log("req.body.token", req.body.token);
+
   const userUpdate = await userModel.updateOne(
-    { token:req.body.token },
+    { token: req.body.token },
     {
       location: {
         lat: req.body.currentLatitude,
@@ -334,8 +334,8 @@ router.get("/contact/users/:token", async function (req, res, next) {
     token: token,
   });
 
-  console.log("dataUser", dataUser);
-  console.log("dataUser._id", dataUser._id);
+  // console.log("dataUser", dataUser);
+  // console.log("dataUser._id", dataUser._id);
 
   const id = dataUser._id;
 
@@ -347,11 +347,38 @@ router.get("/contact/users/:token", async function (req, res, next) {
     userIdEmit: id,
   });
 
+  const dataUsers2 = [];
+  let dataUserFiltered = [];
+
+  for (let i = 0; i < dataMessagesEmit.length; i++) {
+    let data = await userModel.findOne({
+      _id: dataMessagesEmit[i].userIdReception,
+    });
+    dataUsers2.push(data);
+  }
+
+  for (let i = 0; i < dataMessagesEmit.length; i++) {
+    let data2 = await userModel.findOne({
+      _id: dataMessagesReceive[i].userIdEmit,
+    });
+    dataUsers2.push(data2);
+  }
+
+  dataUserFiltered = dataUsers2.map(JSON.stringify);
+
+  uniqueSet = new Set(dataUserFiltered);
+  dataUserFilteredFinal = Array.from(uniqueSet).map(JSON.parse);
+
   if (dataMessagesReceive.length > 0 || dataMessagesEmit.length > 0) {
     result = true;
   }
 
-  res.json({ result, dataMessagesReceive, dataMessagesEmit });
+  res.json({
+    result,
+    dataMessagesReceive,
+    dataMessagesEmit,
+    dataUserFilteredFinal,
+  });
 });
 
 module.exports = router;
