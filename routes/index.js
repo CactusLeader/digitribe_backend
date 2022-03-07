@@ -4,6 +4,7 @@ var router = express.Router();
 const userModel = require("../models/users");
 const messageModel = require("../models/messages");
 const interestModel = require("../models/interests");
+const placeModel = require("../models/place");
 
 const fs = require("fs");
 var uniqid = require("uniqid");
@@ -135,9 +136,19 @@ router.post("/login", async function (req, res, next) {
 });
 
 //Map
-router.get("/map", function (req, res, next) {
+router.get("/map", async function (req, res, next) {
   // récup  position personne / personnes présentes proches / recommandation sur la ville
-  res.render("index", { title: "Express" });
+  console.log("req.query", req.query);
+
+  const user = await userModel.find({})
+  console.log('user', user)
+
+  let result=false
+  if(user) {
+    result=true
+  }
+
+  res.json({result:result, user:user});
 });
 
 router.post("/map", async function (req, res, next) {
@@ -170,7 +181,59 @@ router.post("/map", async function (req, res, next) {
 });
 
 router.post("/place", async function (req, res, next) {
+  //enregistre Poi en BDD
+  console.log("req.body", req.body);
+
+  const token = req.body.token,
+    dataUser = await userModel.findOne({
+      token: token,
+    });
+  console.log("dataUser", dataUser);
+
+  const newPlace = new placeModel({
+    photo: req.body.photo,
+    description: req.body.description,
+    title: req.body.title,
+    coordinate: {
+      lat: req.body.latitude,
+      lon: req.body.longitude,
+    },
+    userId: dataUser._id,
+  });
+  console.log("newPlace", newPlace);
+  savePlace = await newPlace.save();
+
+  let result = false;
+
+  if (newPlace) {
+    result = true;
+  }
+
+  // var place = await placeModel.findById(req.body._id).populate('userId')
+  // console.log('newPlace.title', newPlace.title)
+  // console.log('newPlace.userId.firstname', newPlace.userId.firstname)
+
+  res.json({ result, newPlace });
+});
+
+router.get("/place", async function (req, res, next) {
+  //récupère place en BDD
+  console.log("req.query", req.query);
+
+  const place = await placeModel.find({})
+  console.log('place', place)
+
+  let result = false
+  if (place) {
+    result=true
+  }
+
+  res.json({ result:result , place:place });
+});
+
+router.post("/upload", async function (req, res, next) {
   // enregistre Photo en BDD
+
   console.log("req.files.photo", req.files.photo);
   console.log("req.files.photo.name", req.files.photo.name);
   console.log("req.files.photo.mimetype", req.files.photo.mimetype);
