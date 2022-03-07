@@ -325,6 +325,36 @@ router.get(
   }
 );
 
+router.put(
+  "/messages/users/:token/recipients/:id",
+  async function (req, res, next) {
+    let result = false;
+
+    const token = req.params.token;
+    const id = req.params.id;
+
+    const dataUser = await userModel.findOne({
+      token: token,
+    });
+
+    const readed = await messageModel.updateMany(
+      {
+        userIdEmit: id,
+        userIdReception: dataUser._id,
+      },
+      {
+        read: true,
+      }
+    );
+
+    if (readed) {
+      result = true;
+    }
+
+    res.json({ result });
+  }
+);
+
 router.get("/contact/users/:token", async function (req, res, next) {
   // pour récupérer les messages dans contact
   let result = false;
