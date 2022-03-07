@@ -174,19 +174,23 @@ router.post("/place", async function (req, res, next) {
   //enregistre Poi en BDD
   console.log("req.body", req.body);
 
-  const newPlace = new placeModel(
-    {
-      photo: req.body.photo,
-      description: req.body.description,
-      title: req.body.title,
-      coordinate: {
-        lat: req.body.latitude,
-        lon: req.body.longitude,
-      },
-      userId: req.body._id
-    }
-  );
-  console.log("newPlace", newPlace)
+  const token = req.body.token,
+    dataUser = await userModel.findOne({
+      token: token,
+    });
+  console.log("dataUser", dataUser);
+
+  const newPlace = new placeModel({
+    photo: req.body.photo,
+    description: req.body.description,
+    title: req.body.title,
+    coordinate: {
+      lat: req.body.latitude,
+      lon: req.body.longitude,
+    },
+    userId: dataUser._id,
+  });
+  console.log("newPlace", newPlace);
   savePlace = await newPlace.save();
 
   let result = false;
@@ -195,11 +199,32 @@ router.post("/place", async function (req, res, next) {
     result = true;
   }
 
-  var place = await placeModel.findById(req.body._id).populate('userId')
-  console.log('newPlace.title', newPlace.title)
-  console.log('newPlace.userId.firstname', newPlace.userId.firstname)
+  // var place = await placeModel.findById(req.body._id).populate('userId')
+  // console.log('newPlace.title', newPlace.title)
+  // console.log('newPlace.userId.firstname', newPlace.userId.firstname)
 
   res.json({ result, newPlace });
+});
+
+router.get("/place", async function (req, res, next) {
+  //récupère place en BDD
+  console.log("req.query", req.query);
+
+  const token = req.body.token,
+    dataUser = await userModel.findOne({
+      token: token,
+    });
+    console.log('dataUser', dataUser)
+
+  const place = await placeModel.find({})
+  console.log('place', place)
+
+  let result = false
+  if (place) {
+    result=true
+  }
+
+  res.json({ result:result , place:place });
 });
 
 router.post("/upload", async function (req, res, next) {

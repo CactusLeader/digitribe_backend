@@ -6,7 +6,8 @@ const placeSchema = mongoose.Schema({
   title: String,
   coordinate: Object,
   rating: Number,
-  userId: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
+  userId: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
+  // likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
   cityId: String,
 });
 
