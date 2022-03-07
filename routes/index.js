@@ -136,9 +136,19 @@ router.post("/login", async function (req, res, next) {
 });
 
 //Map
-router.get("/map", function (req, res, next) {
+router.get("/map", async function (req, res, next) {
   // récup  position personne / personnes présentes proches / recommandation sur la ville
-  res.render("index", { title: "Express" });
+  console.log("req.query", req.query);
+
+  const user = await userModel.find({})
+  console.log('user', user)
+
+  let result=false
+  if(user) {
+    result=true
+  }
+
+  res.json({result:result, user:user});
 });
 
 router.post("/map", async function (req, res, next) {
@@ -209,12 +219,6 @@ router.post("/place", async function (req, res, next) {
 router.get("/place", async function (req, res, next) {
   //récupère place en BDD
   console.log("req.query", req.query);
-
-  const token = req.body.token,
-    dataUser = await userModel.findOne({
-      token: token,
-    });
-    console.log('dataUser', dataUser)
 
   const place = await placeModel.find({})
   console.log('place', place)
