@@ -21,6 +21,8 @@ const placeSchema = mongoose.Schema({
   cityId: String,
 });
 
+placeSchema.index({ location: "2dsphere" });
+
 const placeModel = mongoose.model("places", placeSchema);
 
 module.exports = placeModel;

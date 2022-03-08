@@ -13,9 +13,20 @@ const userSchema = mongoose.Schema({
   interestIds: Array,
   cityId: String,
   location: {
-    lat: Number,
-    lon: Number,
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
   },
+  // location: {
+  //   lat: Number,
+  //   lon: Number,
+  // },
 });
 
 const userModel = mongoose.model("users", userSchema);
