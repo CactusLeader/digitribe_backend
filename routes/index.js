@@ -196,9 +196,9 @@ router.post("/place", async function (req, res, next) {
     photo: req.body.photo,
     description: req.body.description,
     title: req.body.title,
-    coordinate: {
-      lat: req.body.latitude,
-      lon: req.body.longitude,
+    location: {
+      type: "Point",
+      coordinates: [req.body.longitude, req.body.latitude],
     },
     userId: dataUser._id,
   });

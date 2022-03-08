@@ -4,9 +4,16 @@ const placeSchema = mongoose.Schema({
   photo: String,
   description: String,
   title: String,
-  coordinate: {
-    lat: Number,
-    lon: Number,
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true,
+    },
+    coordinates: {
+      type: [Number],
+      required: true,
+    },
   },
   rating: Number,
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
