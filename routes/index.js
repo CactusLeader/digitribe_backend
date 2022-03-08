@@ -142,15 +142,15 @@ router.get("/map", async function (req, res, next) {
   // récup  position personne / personnes présentes proches / recommandation sur la ville
   console.log("req.query", req.query);
 
-  const user = await userModel.find({})
-  console.log('user', user)
+  const user = await userModel.find({});
+  console.log("user", user);
 
-  let result=false
-  if(user) {
-    result=true
+  let result = false;
+  if (user) {
+    result = true;
   }
 
-  res.json({result:result, user:user});
+  res.json({ result: result, user: user });
 });
 
 router.post("/map", async function (req, res, next) {
@@ -222,15 +222,15 @@ router.get("/place", async function (req, res, next) {
   //récupère place en BDD
   console.log("req.query", req.query);
 
-  const place = await placeModel.find({})
-  console.log('place', place)
+  const place = await placeModel.find({});
+  console.log("place", place);
 
-  let result = false
+  let result = false;
   if (place) {
-    result=true
+    result = true;
   }
 
-  res.json({ result:result , place:place });
+  res.json({ result: result, place: place });
 });
 
 router.post("/upload", async function (req, res, next) {
@@ -463,12 +463,12 @@ router.get("/contact/users/:token", async function (req, res, next) {
     dataUsers2.push(data);
   }
 
-  // for (let i = 0; i < dataMessagesEmit.length; i++) {
-  //   let data2 = await userModel.findOne({
-  //     _id: dataMessagesReceive[i].userIdEmit,
-  //   });
-  //   dataUsers2.push(data2);
-  // }
+  for (let i = 0; i < dataMessagesReceive.length; i++) {
+    let data2 = await userModel.findOne({
+      _id: dataMessagesReceive[i].userIdEmit,
+    });
+    dataUsers2.push(data2);
+  }
 
   dataUserFiltered = dataUsers2.map(JSON.stringify);
 
