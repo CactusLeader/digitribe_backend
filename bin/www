@@ -31,6 +31,16 @@ io.on("connection", function (socket) {
   });
 });
 
+// io.on("connection", async function (socket) {
+//   // console.log("User connecté =>", socket.conn.remoteAddress);
+
+//   socket.on("sendMessage", function (anotherSocketId, messageData) {
+//     console.log("userId", userId);
+//     console.log("messageData", messageData);
+//     socket.to(anotherSocketId).emit("sendMessageToAll", socket.id, messageData);
+//   });
+// });
+
 /**
  * Listen on provided port, on all network interfaces.
  */
