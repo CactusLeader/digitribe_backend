@@ -162,8 +162,8 @@ router.post("/map", async function (req, res, next) {
     { token: req.body.token },
     {
       location: {
-        lat: req.body.currentLatitude,
-        lon: req.body.currentLongitude,
+        type: "Point",
+        coordinates: [req.body.currentLongitude, req.body.currentLatitude],
       },
     }
   );
@@ -218,17 +218,29 @@ router.post("/place", async function (req, res, next) {
   res.json({ result, newPlace });
 });
 
-router.get("/place", async function (req, res, next) {
+router.get("/place/:token", async function (req, res, next) {
   //récupère place en BDD
-  console.log("req.query", req.query);
+  const token = req.params.token;
 
-  const place = await placeModel.find({});
-  console.log("place", place);
+  console.log("req.query place", req.query);
+
+  const place = await placeModel.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [7.26, 43.7] },
+        distanceField: "dist.calculated",
+        maxDistance: 5000,
+        spherical: true,
+      },
+    },
+  ]);
 
   let result = false;
   if (place) {
     result = true;
   }
+
+  console.log(place);
 
   res.json({ result: result, place: place });
 });
