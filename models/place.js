@@ -4,9 +4,12 @@ const placeSchema = mongoose.Schema({
   photo: String,
   description: String,
   title: String,
-  coordinate: Object,
+  coordinate: {
+    lat: Number,
+    lon: Number,
+  },
   rating: Number,
-  userId: {type: mongoose.Schema.Types.ObjectId, ref: 'users'},
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
   // likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'users'}],
   cityId: String,
 });
