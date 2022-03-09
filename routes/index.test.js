@@ -35,7 +35,7 @@ test("quand personne ne se trouve à proximité", async (done) => {
       coordinate: {
         lat: 43.6,
         lon: 7.24,
-      },
+      }
     })
     .expect({
       result: false,
