@@ -10,6 +10,7 @@ const fs = require("fs");
 var uniqid = require("uniqid");
 const uid2 = require("uid2");
 const bcrypt = require("bcrypt");
+const { setUncaughtExceptionCaptureCallback } = require("process");
 
 var cloudinary = require("cloudinary").v2;
 cloudinary.config({
@@ -177,11 +178,17 @@ router.post("/map", async function (req, res, next) {
   ]);
 
   let result = false;
+  let error = "";
   if (userUpdate && users && places) {
     result = true;
+  } else if (!longitude || !latitude) {
+    result = false;
+  }
+  if (users.length === 0) {
+    error = "Personne ne se trouve à proximité";
   }
 
-  res.json({ result, users, places });
+  res.json({ result, error, users, places });
 });
 
 router.post("/place", async function (req, res, next) {
