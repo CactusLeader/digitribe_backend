@@ -137,60 +137,60 @@ router.post("/login", async function (req, res, next) {
   res.json({ result, user, error, token });
 });
 
-//Map
-router.get("/map", async function (req, res, next) {
-  // récup  position personne / personnes présentes proches / recommandation sur la ville
-  console.log("req.query", req.query);
-
-  const user = await userModel.find({});
-  console.log("user", user);
-
-  let result = false;
-  if (user) {
-    result = true;
-  }
-
-  res.json({ result: result, user: user });
-});
-
 router.post("/map", async function (req, res, next) {
   // enregistre géolocalisation en BDD
-  console.log("req.body", req.body);
-  console.log("req.body.token", req.body.token);
+
+  const token = req.body.token;
+  const longitude = Number(req.body.currentLongitude);
+  const latitude = Number(req.body.currentLatitude);
 
   const userUpdate = await userModel.updateOne(
-    { token: req.body.token },
+    { token },
     {
       location: {
         type: "Point",
-        coordinates: [req.body.currentLongitude, req.body.currentLatitude],
+        coordinates: [longitude, latitude],
       },
     }
   );
-  console.log("userUpdate", userUpdate);
+
+  const users = await userModel.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [longitude, latitude] },
+        distanceField: "dist.calculated",
+        maxDistance: 5000,
+        spherical: true,
+      },
+    },
+  ]);
+
+  const places = await placeModel.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [longitude, latitude] },
+        distanceField: "dist.calculated",
+        maxDistance: 5000,
+        spherical: true,
+      },
+    },
+  ]);
 
   let result = false;
-  let location = {
-    lat: req.body.currentLatitude,
-    lon: req.body.currentLongitude,
-  };
-
-  if (userUpdate) {
+  if (userUpdate && users && places) {
     result = true;
   }
 
-  res.json({ result, location: location });
+  res.json({ result, users, places });
 });
 
 router.post("/place", async function (req, res, next) {
   //enregistre Poi en BDD
-  console.log("req.body", req.body);
 
   const token = req.body.token,
     dataUser = await userModel.findOne({
       token: token,
     });
-  console.log("dataUser", dataUser);
 
   const newPlace = new placeModel({
     photo: req.body.photo,
@@ -202,7 +202,6 @@ router.post("/place", async function (req, res, next) {
     },
     userId: dataUser._id,
   });
-  console.log("newPlace", newPlace);
   savePlace = await newPlace.save();
 
   let result = false;
@@ -211,38 +210,7 @@ router.post("/place", async function (req, res, next) {
     result = true;
   }
 
-  // var place = await placeModel.findById(req.body._id).populate('userId')
-  // console.log('newPlace.title', newPlace.title)
-  // console.log('newPlace.userId.firstname', newPlace.userId.firstname)
-
   res.json({ result, newPlace });
-});
-
-router.get("/place/:token", async function (req, res, next) {
-  //récupère place en BDD
-  const token = req.params.token;
-
-  console.log("req.query place", req.query);
-
-  const place = await placeModel.aggregate([
-    {
-      $geoNear: {
-        near: { type: "Point", coordinates: [7.26, 43.7] },
-        distanceField: "dist.calculated",
-        maxDistance: 5000,
-        spherical: true,
-      },
-    },
-  ]);
-
-  let result = false;
-  if (place) {
-    result = true;
-  }
-
-  console.log(place);
-
-  res.json({ result: result, place: place });
 });
 
 router.post("/upload", async function (req, res, next) {

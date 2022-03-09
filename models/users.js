@@ -16,18 +16,14 @@ const userSchema = mongoose.Schema({
     type: {
       type: String,
       enum: ["Point"],
-      required: true,
     },
     coordinates: {
       type: [Number],
-      required: true,
     },
   },
-  // location: {
-  //   lat: Number,
-  //   lon: Number,
-  // },
 });
+
+userSchema.index({ location: "2dsphere" });
 
 const userModel = mongoose.model("users", userSchema);
 
