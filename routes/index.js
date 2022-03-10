@@ -48,7 +48,7 @@ router.post("/signup/avatar", async function (req, res, next) {
   const avatar = await req.files.avatar.mv(filepath);
 
   if (!avatar) {
-    const avatarUpload = await cloudinary.uploader.upload(filepath);
+    const avatarUpload = await cloudinary.uploader.upload(filepath, {quality: 60, width: 500, height: 500, crop: "limit"});
     console.log(avatarUpload.secure_url);
 
     fs.unlinkSync(filepath);
@@ -226,7 +226,7 @@ router.post("/upload", async function (req, res, next) {
   var resultCopy = await req.files.photo.mv(photoName);
   console.log(resultCopy);
 
-  var resultCloudinary = await cloudinary.uploader.upload(photoName);
+  var resultCloudinary = await cloudinary.uploader.upload(photoName, {quality: 60, width: 500, height: 500, crop: "limit"});
   console.log("resultCloudinary", resultCloudinary);
   console.log("resultCloudinary--url", resultCloudinary.secure_url);
 
